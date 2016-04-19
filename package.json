@@ -1,0 +1,23 @@
+{
+  "name": "utils",
+  "version": "0.0.1",
+  "description": "a collection of utilify libraries written in JavaScript",
+  "main": "index.js",
+  "scripts": {
+    "test": "\"npm test\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/recotj/utils.git"
+  },
+  "keywords": [
+    "utils",
+    "javascript"
+  ],
+  "author": "recotj@gmail.com",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/recotj/utils/issues"
+  },
+  "homepage": "https://github.com/recotj/utils#readme"
+}
