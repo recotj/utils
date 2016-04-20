@@ -4,7 +4,7 @@
   "description": "a collection of utilify libraries written in JavaScript",
   "main": "./dist/utils.js",
   "scripts": {
-    "postinstall": ""
+    "postinstall": "npm install gulp; ./node_modules/.bin/gulp"
   },
   "repository": {
     "type": "git",
