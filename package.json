@@ -2,7 +2,7 @@
   "name": "utils",
   "version": "0.0.1",
   "description": "a collection of utilify libraries written in JavaScript",
-  "main": "index.js",
+  "main": "./dist/utils.js",
   "scripts": {
     "postinstall": ""
   },
