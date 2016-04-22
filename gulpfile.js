@@ -138,11 +138,70 @@ gulp.task('build:min', ['entry'], () => {
 });
 
 gulp.task('install-deps', (done) => {
-	console.log('cwd: ', process.cwd());
-	console.log(require('./package.json'));
-	console.log('devDeps: ', require('./package.json').devDependencies);
-	console.log('deps: ', require('./package.json').devDependencies);
-	done();
+	const pkgJSON = require('./package.json');
+	const projectDir = pkgJSON._where;
+	if (!projectDir) return done();
+
+	const devDepMap = pkgJSON.devDependencies || {};
+	const depMap = pkgJSON.dependencies || {};
+
+	const deps = [].concat(Object.keys(devDepMap), Object.keys(depMap));
+
+	const total = deps.length;
+	var finished = 0;
+
+	deps.forEach((dep) => {
+		var shouldInstall = true;
+		var where = projectDir;
+		try {
+			const versionExisted = require(`${dep}/package.json`).version;
+			const versionExpected = devDepMap[dep] || depMap[dep];
+
+			const versionComponentsExisted = versionExisted.split('.');
+			const versionComponentsExpected = versionExpected.split('.');
+
+			const mainExisted = versionComponentsExisted[0];
+			const subExisted = versionComponentsExisted[1];
+
+			const mainExpected = versionComponentsExpected[0];
+			const subExpected = versionComponentsExpected[1];
+
+			// existed.
+			if (mainExisted === mainExpected && subExisted === subExpected) {
+				shouldInstall = false;
+			} else {
+				where = undefined;
+			}
+		} catch (err) {
+		}
+
+		if (!shouldInstall) return;
+
+		console.log(`start to install ${dep} in ${where || __dirname} ...`);
+
+		const spawn = require('child_process').spawn;
+		const install = spawn('npm', ['install', dep], {cwd: where});
+
+		const errors = [];
+
+		install.stdout.on('data', (data) => {
+			console.log(`stdout: ${data}`);
+		});
+		install.stderr.on('data', (error) => {
+			console.error(`stderr: ${error}`);
+			errors.push(error);
+		});
+		install.on('close', () => {
+			finished += 1;
+			console.log(`finish ${dep} installation. complete:  ${finished}/${total}\n\n`);
+
+			if (finished === total) {
+				const error = errors.length === 0 ? undefined : errors.join('\n\n');
+				done(error);
+			}
+		});
+
+	});
 });
 
 gulp.task('release', ['install-deps'], (done) => {
