@@ -14,7 +14,8 @@ const srcEx = isWin32 ? /(packages\\[^\\]+)\\src\\/ : /(packages\/[^\/]+)\/src\/
 const libFragment = isWin32 ? '$1\\lib\\' : '$1/lib/';
 
 gulp.task('clean', (done) => {
-	require('del')(DIST_PATH)
+	const del = require('del');
+	del(DIST_PATH)
 		.then(paths => {
 			paths.forEach(path => console.log('delete: %s', path.replace(__dirname, '')));
 			done();
@@ -136,20 +137,11 @@ gulp.task('build:min', ['entry'], () => {
 		.pipe(gulp.dest(DIST_PATH));
 });
 
-gulp.task('clear:source-packages', (done) => {
-	require('del')(PACKAGES_PATH)
-		.then(paths => {
-			paths.forEach(path => console.log('delete: %s', path.replace(__dirname, '')));
-			done();
-		});
-});
-
 gulp.task('release', (done) => {
 	const run = require('run-sequence');
 	return run(
 		'clean',
 		['build', 'build:min'],
-		'clear:source-packages',
 		done
 	);
 });
@@ -161,15 +153,4 @@ gulp.task('default', (done) => {
 		'build',
 		done
 	);
-});
-
-gulp.task('t', (done) => {
-	const fs = require('fs');
-	fs.stat(PACKAGES_PATH, (error, stats) => {
-		if (error) console.error(error);
-		else {
-			console.log(stats.isDirectory());
-		}
-		done();
-	})
 });
