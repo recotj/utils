@@ -137,9 +137,27 @@ gulp.task('build:min', ['entry'], () => {
 		.pipe(gulp.dest(DIST_PATH));
 });
 
-gulp.task('install-deps', (done) => {
+gulp.task('semver', (done) => {
+	var shouldInstall = true;
+	try {
+		require.resolve('semver');
+		shouldInstall = false;
+	} catch (e) {
+	}
+
+	if (!shouldInstall) return done();
+
+	installDep('semver', {
+		onclose(error) {
+			done(error);
+		}
+	});
+});
+
+gulp.task('install-deps', ['semver'], (done) => {
+	const semver = require('semver');
 	const pkgJSON = require('./package.json');
-	const projectDir = pkgJSON._where;
+	const projectDir = pkgJSON._where || process.cwd();
 	if (!projectDir) return done();
 
 	const devDepMap = pkgJSON.devDependencies || {};
@@ -149,6 +167,7 @@ gulp.task('install-deps', (done) => {
 
 	const total = deps.length;
 	var finished = 0;
+	var allInstalled = true;
 
 	deps.forEach((dep) => {
 		var shouldInstall = true;
@@ -157,17 +176,8 @@ gulp.task('install-deps', (done) => {
 			const versionExisted = require(`${dep}/package.json`).version;
 			const versionExpected = devDepMap[dep] || depMap[dep];
 
-			const versionComponentsExisted = versionExisted.split('.');
-			const versionComponentsExpected = versionExpected.split('.');
-
-			const mainExisted = versionComponentsExisted[0];
-			const subExisted = versionComponentsExisted[1];
-
-			const mainExpected = versionComponentsExpected[0];
-			const subExpected = versionComponentsExpected[1];
-
 			// existed.
-			if (mainExisted === mainExpected && subExisted === subExpected) {
+			if (semver.satisfies(versionExisted, versionExpected)) {
 				shouldInstall = false;
 			} else {
 				where = undefined;
@@ -175,33 +185,35 @@ gulp.task('install-deps', (done) => {
 		} catch (err) {
 		}
 
-		if (!shouldInstall) return;
+		if (!shouldInstall) {
+			console.log(`${dep} already installed.`);
+			finished += 1;
+			return;
+		}
+
+		allInstalled = false;
 
 		console.log(`start to install ${dep} in ${where || __dirname} ...`);
 
-		const spawn = require('child_process').spawn;
-		const install = spawn('npm', ['install', dep], {cwd: where});
-
 		const errors = [];
 
-		install.stdout.on('data', (data) => {
-			console.log(`stdout: ${data}`);
-		});
-		install.stderr.on('data', (error) => {
-			console.error(`stderr: ${error}`);
-			errors.push(error);
-		});
-		install.on('close', () => {
-			finished += 1;
-			console.log(`finish ${dep} installation. complete:  ${finished}/${total}\n\n`);
+		installDep(dep, where, {
+			onerror(error) {
+				errors.push(error);
+			},
+			onclose() {
+				finished += 1;
+				console.log(`complete:  ${finished}/${total}\n\n`);
 
-			if (finished === total) {
-				const error = errors.length === 0 ? undefined : errors.join('\n\n');
-				done(error);
+				if (finished === total) {
+					const error = errors.length === 0 ? undefined : errors.join('\n\n');
+					done(error);
+				}
 			}
 		});
-
 	});
+
+	if (allInstalled) done();
 });
 
 gulp.task('release', ['install-deps'], (done) => {
@@ -221,3 +233,37 @@ gulp.task('default', (done) => {
 		done
 	);
 });
+
+function installDep(dep, dir, hooks) {
+	if (typeof dir === 'object') {
+		var temp = dir;
+		dir = hooks;
+		hooks = temp;
+	}
+
+	const spawn = require('child_process').spawn;
+	const install = spawn('npm', ['install', dep], {cwd: dir});
+
+	var error;
+	var data;
+
+	install.stdout.on('data', (dat) => {
+		console.log(`stdout: ${dat}`);
+		data = dat;
+
+		const hook = hooks && hooks.ondata;
+		if (typeof hook === 'function') hook(dat);
+	});
+	install.stderr.on('data', (err) => {
+		console.error(`stderr: ${err}`);
+		error = err;
+
+		const hook = hooks && hooks.onerror;
+		if (typeof hook === 'function') hook(err);
+	});
+	install.on('close', () => {
+		console.log(`finish ${dep} installation\n`);
+		const hook = hooks && hooks.onclose;
+		if (typeof hook === 'function') hook(error, data);
+	});
+}
