@@ -139,6 +139,7 @@ gulp.task('build:min', ['entry'], () => {
 
 gulp.task('install-deps', (done) => {
 	console.log('cwd: ', process.cwd());
+	console.log(require('./package.json'));
 	console.log('devDeps: ', require('./package.json').devDependencies);
 	console.log('deps: ', require('./package.json').devDependencies);
 	done();
