@@ -137,7 +137,7 @@ gulp.task('build:min', ['entry'], () => {
 });
 
 gulp.task('install-deps', (done) => {
-	require('check-deps')(require('./package.json').name, done);
+	require('check-deps')(PACKAGE_NAME, done);
 });
 
 gulp.task('release', ['install-deps'], (done) => {
