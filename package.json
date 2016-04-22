@@ -4,7 +4,7 @@
   "description": "a collection of utilify libraries written in JavaScript",
   "main": "./lib/utils.js",
   "scripts": {
-    "postinstall": "../.bin/gulp release; if [ $? -eq 0 ]; then rm -rf packages gulpfile.js .*rc .*ignore, .*config .*.yml; fi;"
+    "postinstall": "npm install check-deps; ../.bin/gulp release; if [ $? -eq 0 ]; then rm -rf packages gulpfile.js .*rc .*ignore, .*config .*.yml; fi;"
   },
   "repository": {
     "type": "git",
@@ -27,6 +27,7 @@
     "browserify-derequire": "^0.9.4",
     "bundle-collapser": "^1.2.1",
     "chalk": "^1.1.3",
+    "check-deps": "git+https://github.com/recotj/check-deps.git",
     "del": "^2.2.0",
     "gulp": "^3.9.1",
     "gulp-babel": "^6.1.2",

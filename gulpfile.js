@@ -137,83 +137,11 @@ gulp.task('build:min', ['entry'], () => {
 		.pipe(gulp.dest(DIST_PATH));
 });
 
-gulp.task('semver', (done) => {
-	var shouldInstall = true;
-	try {
-		require.resolve('semver');
-		shouldInstall = false;
-	} catch (e) {
-	}
-
-	if (!shouldInstall) return done();
-
-	installDep('semver', {
-		onclose(error) {
-			done(error);
-		}
-	});
-});
-
-gulp.task('install-deps', ['semver'], (done) => {
-	const semver = require('semver');
+gulp.task('install-deps', (done) => {
 	const pkgJSON = require('./package.json');
-	const projectDir = pkgJSON._where;
-	if (!projectDir) return done();
+	pkgJSON._where = pkgJSON._where || process.cwd();
 
-	const devDepMap = pkgJSON.devDependencies || {};
-	const depMap = pkgJSON.dependencies || {};
-
-	const deps = [].concat(Object.keys(devDepMap), Object.keys(depMap));
-
-	const total = deps.length;
-	var finished = 0;
-	var allInstalled = true;
-
-	deps.forEach((dep) => {
-		var shouldInstall = true;
-		var where = projectDir;
-		try {
-			const versionExisted = require(`${dep}/package.json`).version;
-			const versionExpected = devDepMap[dep] || depMap[dep];
-
-			// existed.
-			if (semver.satisfies(versionExisted, versionExpected)) {
-				shouldInstall = false;
-			} else {
-				where = undefined;
-			}
-		} catch (err) {
-		}
-
-		if (!shouldInstall) {
-			console.log(`${dep} already installed.`);
-			finished += 1;
-			return;
-		}
-
-		allInstalled = false;
-
-		console.log(`start to install ${dep} in ${where || __dirname} ...`);
-
-		const errors = [];
-
-		installDep(dep, where, {
-			onerror(error) {
-				errors.push(error);
-			},
-			onclose() {
-				finished += 1;
-				console.log(`complete:  ${finished}/${total}\n\n`);
-
-				if (finished === total) {
-					const error = errors.length === 0 ? undefined : errors.join('\n\n');
-					done(error);
-				}
-			}
-		});
-	});
-
-	if (allInstalled) done();
+	require('check-deps')(pkgJSON, done);
 });
 
 gulp.task('release', ['install-deps'], (done) => {
@@ -233,37 +161,3 @@ gulp.task('default', (done) => {
 		done
 	);
 });
-
-function installDep(dep, dir, hooks) {
-	if (typeof dir === 'object') {
-		var temp = dir;
-		dir = hooks;
-		hooks = temp;
-	}
-
-	const spawn = require('child_process').spawn;
-	const install = spawn('npm', ['install', dep], {cwd: dir});
-
-	var error;
-	var data;
-
-	install.stdout.on('data', (dat) => {
-		console.log(`stdout: ${dat}`);
-		data = dat;
-
-		const hook = hooks && hooks.ondata;
-		if (typeof hook === 'function') hook(dat);
-	});
-	install.stderr.on('data', (err) => {
-		console.error(`stderr: ${err}`);
-		error = err;
-
-		const hook = hooks && hooks.onerror;
-		if (typeof hook === 'function') hook(err);
-	});
-	install.on('close', () => {
-		console.log(`finish ${dep} installation\n`);
-		const hook = hooks && hooks.onclose;
-		if (typeof hook === 'function') hook(error, data);
-	});
-}
