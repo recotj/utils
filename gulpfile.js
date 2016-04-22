@@ -4,7 +4,6 @@ const gulp = require('gulp');
 const PACKAGE_NAME = require('./package.json').name;
 const PACKAGES_PATH = './packages';
 const DIST_PATH = './lib';
-const DIST_PACKAGES_PATH = `${DIST_PATH}/packages`;
 const ENTRY_FILE = 'entry.js';
 
 const PACKAGE_PREFIX = '';
@@ -60,7 +59,7 @@ gulp.task('build:modules', ['build:packages'], () => {
 				gutil.log(err.stack);
 			}
 		}))
-		.pipe(gulp.dest(DIST_PACKAGES_PATH));
+		.pipe(gulp.dest(DIST_PATH));
 });
 
 gulp.task('entry', ['build:modules'], (done) => {
@@ -69,7 +68,7 @@ gulp.task('entry', ['build:modules'], (done) => {
 	const fs = require('fs');
 	const makeVinylStream = require('vinyl-source-stream');
 
-	fs.readdir(DIST_PACKAGES_PATH, (error, files) => {
+	fs.readdir(DIST_PATH, (error, files) => {
 		if (error) return console.error(error);
 		const scripts = [];
 		files.forEach((filename) => {
@@ -81,7 +80,7 @@ gulp.task('entry', ['build:modules'], (done) => {
 		pass.end(new Buffer(scripts.join('\n'), 'utf8'));
 
 		const out = pass.pipe(makeVinylStream(ENTRY_FILE))
-			.pipe(gulp.dest(DIST_PACKAGES_PATH));
+			.pipe(gulp.dest(DIST_PATH));
 
 		done(null, out);
 	});
@@ -93,7 +92,7 @@ gulp.task('build', ['entry'], () => {
 
 	const options = {
 		entries: [ENTRY_FILE],
-		basedir: DIST_PACKAGES_PATH,
+		basedir: DIST_PATH,
 		standalone: PACKAGE_NAME
 	};
 
@@ -114,7 +113,7 @@ gulp.task('build:min', ['entry'], () => {
 
 	const options = {
 		entries: [ENTRY_FILE],
-		basedir: DIST_PACKAGES_PATH,
+		basedir: DIST_PATH,
 		standalone: PACKAGE_NAME,
 		plugin: [derequire, collapse]
 	};
