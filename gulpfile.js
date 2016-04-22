@@ -3,7 +3,7 @@ const gulp = require('gulp');
 
 const PACKAGE_NAME = require('./package.json').name;
 const PACKAGES_PATH = './packages';
-const DIST_PATH = './dist';
+const DIST_PATH = './lib';
 const DIST_PACKAGES_PATH = `${DIST_PATH}/packages`;
 const ENTRY_FILE = 'entry.js';
 
@@ -50,7 +50,15 @@ gulp.task('build:packages', () => {
 });
 
 gulp.task('build:modules', ['build:packages'], () => {
+	const plumber = require('gulp-plumber');
+	const gutil = require('gulp-util');
+
 	return gulp.src([`${PACKAGES_PATH}/*/lib/**/*.js`, `${PACKAGES_PATH}/*/package.json`])
+		.pipe(plumber({
+			errorHandler(err) {
+				gutil.log(err.stack);
+			}
+		}))
 		.pipe(gulp.dest(DIST_PACKAGES_PATH));
 });
 
@@ -128,12 +136,20 @@ gulp.task('build:min', ['entry'], () => {
 		.pipe(gulp.dest(DIST_PATH));
 });
 
+gulp.task('clear:source-packages', (done) => {
+	require('del')(PACKAGES_PATH)
+		.then(paths => {
+			paths.forEach(path => console.log('delete: %s', path.replace(__dirname, '')));
+			done();
+		});
+});
 
 gulp.task('release', (done) => {
 	const run = require('run-sequence');
 	return run(
 		'clean',
 		['build', 'build:min'],
+		'clear:source-packages',
 		done
 	);
 });
@@ -145,4 +161,15 @@ gulp.task('default', (done) => {
 		'build',
 		done
 	);
+});
+
+gulp.task('t', (done) => {
+	const fs = require('fs');
+	fs.stat(PACKAGES_PATH, (error, stats) => {
+		if (error) console.error(error);
+		else {
+			console.log(stats.isDirectory());
+		}
+		done();
+	})
 });
