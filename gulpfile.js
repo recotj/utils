@@ -157,7 +157,7 @@ gulp.task('semver', (done) => {
 gulp.task('install-deps', ['semver'], (done) => {
 	const semver = require('semver');
 	const pkgJSON = require('./package.json');
-	const projectDir = pkgJSON._where || process.cwd();
+	const projectDir = pkgJSON._where;
 	if (!projectDir) return done();
 
 	const devDepMap = pkgJSON.devDependencies || {};
