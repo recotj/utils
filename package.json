@@ -2,7 +2,7 @@
   "name": "utils",
   "version": "0.0.1",
   "description": "a collection of utilify libraries written in JavaScript",
-  "main": "./dist/utils.js",
+  "main": "./lib/utils.js",
   "scripts": {
     "postinstall": "../.bin/gulp release; if [ $? -eq 0 ]; then rm -rf packages gulpfile.js .*rc .*ignore, .*config .*.yml; fi;"
   },
