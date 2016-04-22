@@ -7,6 +7,8 @@ const DIST_PATH = './dist';
 const DIST_PACKAGES_PATH = `${DIST_PATH}/packages`;
 const ENTRY_FILE = 'entry.js';
 
+const PACKAGE_PREFIX = '';
+
 const isWin32 = (path.win32 === path);
 const srcEx = isWin32 ? /(packages\\[^\\]+)\\src\\/ : /(packages\/[^\/]+)\/src\//;
 const libFragment = isWin32 ? '$1\\lib\\' : '$1/lib/';
@@ -62,6 +64,7 @@ gulp.task('entry', ['build:modules'], (done) => {
 		if (error) return console.error(error);
 		const scripts = [];
 		files.forEach((filename) => {
+			if (PACKAGE_PREFIX) filename = filename.replace(PACKAGE_PREFIX, '');
 			const key = filename.replace(/-([a-z])/g, (m, p1) => p1.toUpperCase());
 			const script = `module.exports['${key}'] = require('./${filename}');`;
 			scripts.push(script);

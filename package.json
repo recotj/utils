@@ -3,6 +3,9 @@
   "version": "0.0.1",
   "description": "a collection of utilify libraries written in JavaScript",
   "main": "./dist/utils.js",
+  "scripts": {
+    "postinstall": "cd ./node_modules/utils; ../.bin/gulp; cd ../..;"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/recotj/utils.git"
