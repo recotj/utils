@@ -4,7 +4,7 @@
   "description": "a collection of utilify libraries written in JavaScript",
   "main": "./lib/utils.js",
   "scripts": {
-    "postinstall": "scripts/check_deps; scripts/build; scripts/clear_source; rm -rf scripts"
+    "postinstall": "scripts/check_deps; scripts/build; scripts/clear_source;"
   },
   "repository": {
     "type": "git",
