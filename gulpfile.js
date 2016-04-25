@@ -95,6 +95,9 @@ gulp.task('build', ['entry'], () => {
 		entries: [ENTRY_FILE],
 		basedir: DIST_PATH,
 		standalone: PACKAGE_NAME,
+		// @see https://github.com/rse/browserify-derequire#about
+		// "even in standalone mode all require() calls are left intact. and this causes trouble on
+		// subsequent embedding of the bundle (and this way reanalyzing) in other Browserify toolchains"
 		plugin: [derequire]
 	};
 
