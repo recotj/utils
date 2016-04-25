@@ -89,11 +89,13 @@ gulp.task('entry', ['build:modules'], (done) => {
 gulp.task('build', ['entry'], () => {
 	const browserify = require('browserify');
 	const makeVinylStream = require('vinyl-source-stream');
+	const derequire = require('browserify-derequire');
 
 	const options = {
 		entries: [ENTRY_FILE],
 		basedir: DIST_PATH,
-		standalone: PACKAGE_NAME
+		standalone: PACKAGE_NAME,
+		plugin: [derequire]
 	};
 
 	return browserify(options)
