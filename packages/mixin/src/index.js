@@ -1,6 +1,6 @@
 const PresetPolicy = require('./policy');
 
-const mixin = module.exports = ({mixins, policy, handleConflict}) => {
+module.exports = ({ mixins, policy, handleConflict }) => {
 	if (!Array.isArray(mixins) || mixins.length <= 0) {
 		throw new TypeError('expect mixins as a non-empty array');
 	}
@@ -35,7 +35,7 @@ const mixin = module.exports = ({mixins, policy, handleConflict}) => {
 	}
 };
 
-mixin.PresetPolicy = PresetPolicy;
+module.exports.PresetPolicy = PresetPolicy;
 
 function getHandlers(handleConflict, policy) {
 	const handlers = [];
