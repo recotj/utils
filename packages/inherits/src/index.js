@@ -1,4 +1,4 @@
-module.exports = (subClass, superClass) => {
+export default (subClass, superClass) => {
 	if (subClass === undefined || subClass === null)
 		throw new TypeError(`The sub class to 'inherits' must not be null or undefined.`);
 

@@ -1,12 +1,12 @@
-const {flow, flowRight} = require('./presets/flow');
-const {chain, chainRight} = require('./presets/chain');
-const {merge, mergeRight} = require('./presets/merge');
-const {objectMerge, objectMergeRight} = require('./presets/objectMerge');
-const {override, overrideRight} = require('./presets/override');
+import {flow, flowRight} from './presets/flow';
+import {chain, chainRight} from './presets/chain';
+import {merge, mergeRight} from './presets/merge';
+import {objectMerge, objectMergeRight} from './presets/objectMerge';
+import {override, overrideRight} from './presets/override';
 
 const PRESET_MIXIN_POLICY = Symbol('preset-mixin-policy');
 
-const presets = module.exports = {
+const presets = {
 	FLOW: flow,
 	FLOW_RIGHT: flowRight,
 	CHAIN: chain,
@@ -23,7 +23,9 @@ Object.keys(presets).forEach((k) => {
 	register(presets[k]);
 });
 
-module.exports.isPresetPolicy = (policy) => {
+export default presets;
+
+export const isPresetPolicy = (policy) => {
 	return policy && policy[PRESET_MIXIN_POLICY];
 };
 

@@ -1,13 +1,13 @@
-module.exports.merge = (...methods) => {
-	return function (/*arguments*/) {
+export const merge = (...methods) => {
+	return function (/*...arguments*/) {
 		return methods.reduce((merged, method) => {
 			return reduceBody(merged, method, this, arguments);
 		}, {});
 	};
 };
 
-module.exports.mergeRight = (...methods) => {
-	return function (/*arguments*/) {
+export const mergeRight = (...methods) => {
+	return function (/*...arguments*/) {
 		return methods.reduceRight((merged, method) => {
 			return reduceBody(merged, method, this, arguments);
 		}, {});

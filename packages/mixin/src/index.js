@@ -1,6 +1,6 @@
-const PresetPolicy = require('./policy');
+import PresetPolicy, {isPresetPolicy} from './policy';
 
-module.exports = ({ mixins, policy, handleConflict }) => {
+export default ({ mixins, policy, handleConflict }) => {
 	if (!Array.isArray(mixins) || mixins.length <= 0) {
 		throw new TypeError('expect mixins as a non-empty array');
 	}
@@ -35,7 +35,7 @@ module.exports = ({ mixins, policy, handleConflict }) => {
 	}
 };
 
-module.exports.PresetPolicy = PresetPolicy;
+export {PresetPolicy};
 
 function getHandlers(handleConflict, policy) {
 	const handlers = [];
@@ -64,7 +64,7 @@ function normalizePolicyHandler(handler) {
 
 	const filtered = keys.reduce((r, k) => {
 		const p = handler[k];
-		if (PresetPolicy.isPresetPolicy(p)) r[k] = p;
+		if (isPresetPolicy(p)) r[k] = p;
 		return r;
 	}, {});
 

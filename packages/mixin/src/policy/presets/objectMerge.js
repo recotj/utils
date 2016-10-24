@@ -1,12 +1,8 @@
-module.exports.objectMerge = (...objects) => {
-	return objects.reduce((merged, object) => {
-		return Object.assign(merged, object);
-	}, {});
+export const objectMerge = (...objects) => {
+	return objects.reduce(Object.assign, {});
 };
 
-module.exports.objectMergeRight = (...objects) => {
-	return objects.reduceRight((merged, object) => {
-		return Object.assign(merged, object);
-	}, {});
+export const objectMergeRight = (...objects) => {
+	return objects.reduceRight(Object.assign, {});
 };
 

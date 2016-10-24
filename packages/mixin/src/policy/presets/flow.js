@@ -1,13 +1,13 @@
-module.exports.flow = (...methods) => {
-	return function (/*arguments*/) {
+export const flow = (...methods) => {
+	return function (/*...arguments*/) {
 		return methods.reduce((flowed, method) => {
 			return reduceBody(flowed, method, this);
 		}, undefined);
 	};
 };
 
-module.exports.flowRight = (...methods) => {
-	return function (/*arguments*/) {
+export const flowRight = (...methods) => {
+	return function (/*...arguments*/) {
 		return methods.reduceRight((flowed, method) => {
 			return reduceBody(flowed, method, this);
 		}, undefined);

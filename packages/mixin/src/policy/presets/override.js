@@ -1,4 +1,4 @@
-module.exports.override = (...methods) => {
+export const override = (...methods) => {
 	let result;
 
 	methods.some((method) => {
@@ -10,7 +10,7 @@ module.exports.override = (...methods) => {
 	return result;
 };
 
-module.exports.overrideRight = (...methods) => {
+export const overrideRight = (...methods) => {
 	let result;
 
 	methods.reverse().some((method) => {
